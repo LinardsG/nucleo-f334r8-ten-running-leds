@@ -274,10 +274,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 }
 
 /* USER CODE BEGIN 4 */
-
+void
+HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == B1_Pin)
+    {
+      HAL_GPIO_TogglePin (LD2_GPIO_Port, LD2_Pin);
+    }
+  else
+    {
+      __NOP();
+    }
+}
 /* USER CODE END 4 */
 
 /**
