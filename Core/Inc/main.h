@@ -75,7 +75,27 @@ void Error_Handler(void);
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define L0_GPIO_Port GPIOC
+#define L1_GPIO_Port GPIOC
+#define L2_GPIO_Port GPIOC
+#define L3_GPIO_Port GPIOC
+#define L4_GPIO_Port GPIOC
+#define L5_GPIO_Port GPIOC
+#define L6_GPIO_Port GPIOC
+#define L7_GPIO_Port GPIOC
+#define L8_GPIO_Port GPIOC
+#define L9_GPIO_Port GPIOC
 
+#define L0_Pin GPIO_PIN_0
+#define L1_Pin GPIO_PIN_1
+#define L2_Pin GPIO_PIN_2
+#define L3_Pin GPIO_PIN_3
+#define L4_Pin GPIO_PIN_4
+#define L5_Pin GPIO_PIN_5
+#define L6_Pin GPIO_PIN_6
+#define L7_Pin GPIO_PIN_7
+#define L8_Pin GPIO_PIN_8
+#define L9_Pin GPIO_PIN_9
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
