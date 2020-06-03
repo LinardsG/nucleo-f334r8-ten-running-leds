@@ -219,6 +219,85 @@ void TIM6_DAC1_IRQHandler(void)
   /* USER CODE BEGIN TIM6_DAC1_IRQn 0 */
   HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
+  switch(led_counter)
+  {
+    case 0:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
+      break;
+    case 1:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+      break;
+    case 2:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
+      break;
+    case 3:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
+      break;
+    case 4:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
+      break;
+    case 5:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+      break;
+    case 6:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+      break;
+    case 7:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
+      break;
+    case 8:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+      break;
+    case 9:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+      break;
+    default:
+      break;
+  }
+  if(increment < 0 && led_counter == 0)
+    {
+      led_counter = 10;
+    }
+  led_counter += increment;
+  if(increment > 0 && led_counter == 10)
+    {
+      led_counter = 0;
+    }
+  switch(led_counter)
+  {
+    case 0:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
+      break;
+    case 1:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+      break;
+    case 2:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
+      break;
+    case 3:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
+      break;
+    case 4:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
+      break;
+    case 5:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+      break;
+    case 6:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+      break;
+    case 7:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+      break;
+    case 8:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
+      break;
+    case 9:
+      HAL_GPIO_WritePin (GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
+      break;
+    default:
+      break;
+  }
   /* USER CODE END TIM6_DAC1_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC1_IRQn 1 */

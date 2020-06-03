@@ -46,7 +46,8 @@ TIM_HandleTypeDef htim6;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+int led_counter = 0;
+int increment = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -112,49 +113,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      for (int i = 0; i < 10; i++)
-	{
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_4, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_7, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
-	  HAL_Delay (10);
-	  HAL_GPIO_WritePin (GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-	  HAL_Delay (10);
-	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -331,6 +289,14 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
   if (GPIO_Pin == B1_Pin)
     {
       HAL_GPIO_TogglePin (LD2_GPIO_Port, LD2_Pin);
+      if (increment > 0)
+      {
+    	  increment = -1;
+      }
+      else
+      {
+    	  increment = 1;
+      }
     }
   else
     {
