@@ -254,12 +254,12 @@ void TIM6_DAC1_IRQHandler(void)
     default:
       break;
   }
-  if(increment < 0 && led_counter == 0)
+  if(position_increment < 0 && led_counter == 0)
     {
       led_counter = 10;
     }
-  led_counter += increment;
-  if(increment > 0 && led_counter == 10)
+  led_counter += position_increment;
+  if(position_increment > 0 && led_counter == 10)
     {
       led_counter = 0;
     }

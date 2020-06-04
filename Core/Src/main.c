@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +34,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define WELCOME_MSG "\r\nPress + or - to change led on time!\n"
+#define PROMPT "\r\n?: "
+#define DEFAULT_LED_ON_TIME_MS 500
+#define MAX_LED_ON_TIME_MS 500
+#define MIN_LED_ON_TIME_MS 10
+#define THRESHOLD_LED_ON_TIME_MS 100 // Threshold at which led increment changes
+#define MIN_LED_ON_TIME_INCREMENT_MS 1
+#define MAX_LED_ON_TIME_INCREMENT_MS 10
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -47,10 +57,8 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 int led_counter = 0;
-int increment = 1;
-uint8_t tx_buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-uint8_t rx_buffer[10];
-HAL_StatusTypeDef return_val;
+int position_increment = 1;
+char opt;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,16 +67,11 @@ static void MX_GPIO_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-int _write(int file, char *ptr, int len)
-{
-	/* Implement write code here, this is used by puts and printf for example */
-	int i = 0;
-	for (i = 0; i < len; i++)
-	{
-		ITM_SendChar((*ptr++));
-	}
-	return len;
-}
+int _write(int file, char *ptr, int len);
+void printWelcomeMessage(void);
+char readUserInput(void);
+uint8_t processUserInput(char opt);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -123,17 +126,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  printWelcomeMessage();
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  return_val = HAL_UART_Transmit(&huart2, tx_buffer, 10, HAL_MAX_DELAY);
-	  return_val = HAL_UART_Receive(&huart2, rx_buffer, 10, HAL_MAX_DELAY);
+	  opt = readUserInput();
+	  processUserInput(opt);
   }
   /* USER CODE END 3 */
 }
-
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -143,7 +146,7 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -155,7 +158,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -188,9 +191,9 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 1000;
+  htim6.Init.Prescaler = 64000;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 64000;
+  htim6.Init.Period = 500;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -259,8 +262,8 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3 
-                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7 
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
+                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7
                           |GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -272,11 +275,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PC0 PC1 PC2 PC3 
-                           PC4 PC5 PC6 PC7 
+  /*Configure GPIO pins : PC0 PC1 PC2 PC3
+                           PC4 PC5 PC6 PC7
                            PC8 PC9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3 
-                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7 
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
+                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7
                           |GPIO_PIN_8|GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -303,13 +306,13 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
   if (GPIO_Pin == B1_Pin)
     {
       HAL_GPIO_TogglePin (LD2_GPIO_Port, LD2_Pin);
-      if (increment > 0)
+      if (position_increment > 0)
       {
-    	  increment = -1;
+    	  position_increment = -1;
       }
       else
       {
-    	  increment = 1;
+    	  position_increment = 1;
       }
     }
   else
@@ -317,6 +320,87 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
       __NOP();
     }
 }
+
+int _write(int file, char *ptr, int len)
+{
+	/* Implement write code here, this is used by puts and printf for example */
+	int i = 0;
+	for (i = 0; i < len; i++)
+	{
+		ITM_SendChar((*ptr++));
+	}
+	return len;
+}
+
+void printWelcomeMessage(void)
+{
+	HAL_UART_Transmit(&huart2, (uint8_t*) WELCOME_MSG, strlen(WELCOME_MSG),
+			HAL_MAX_DELAY);
+}
+
+char readUserInput(void)
+{
+	char readBuf[25];
+	HAL_UART_Transmit(&huart2, (uint8_t*) PROMPT, strlen(PROMPT),
+			HAL_MAX_DELAY);
+	HAL_UART_Receive(&huart2, (uint8_t*)readBuf, 1, HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart2, (uint8_t*)readBuf, strlen(readBuf),
+			HAL_MAX_DELAY);
+
+	return readBuf[0];
+}
+
+uint8_t processUserInput(char opt)
+{
+	char led_on_time[30];
+	int increment;
+	if (opt != '+' && opt != '-')
+	{
+		TIM6->ARR = DEFAULT_LED_ON_TIME_MS;
+		snprintf(led_on_time, 30, "\r\nLed on time is %d ms.\n", (int)TIM6->ARR);
+		HAL_UART_Transmit(&huart2, (uint8_t*) led_on_time, strlen(led_on_time), HAL_MAX_DELAY);
+		return 0;
+	}
+	switch (opt)
+	{
+	case '+':
+		if (TIM6->ARR >= THRESHOLD_LED_ON_TIME_MS)
+		{
+			increment = MAX_LED_ON_TIME_INCREMENT_MS;
+		}
+		else
+		{
+			increment = MIN_LED_ON_TIME_INCREMENT_MS;
+		}
+		TIM6->ARR += increment;
+		if (TIM6->ARR > MAX_LED_ON_TIME_MS)
+		{
+			TIM6->ARR = MAX_LED_ON_TIME_MS;
+		}
+		snprintf(led_on_time, 30, "\r\nLed on time is %d ms.\n", (int)TIM6->ARR);
+		HAL_UART_Transmit(&huart2, (uint8_t*) led_on_time, strlen(led_on_time), HAL_MAX_DELAY);
+		break;
+	case '-':
+		if (TIM6->ARR < THRESHOLD_LED_ON_TIME_MS)
+		{
+			increment = MIN_LED_ON_TIME_INCREMENT_MS;
+		}
+		else
+		{
+			increment = MAX_LED_ON_TIME_INCREMENT_MS;
+		}
+		TIM6->ARR -= increment;
+		if (TIM6->ARR < MIN_LED_ON_TIME_MS)
+		{
+			TIM6->ARR = MIN_LED_ON_TIME_MS;
+		}
+		snprintf(led_on_time, 30, "\r\nLed on time is %d ms.\n", (int)TIM6->ARR);
+		HAL_UART_Transmit(&huart2, (uint8_t*) led_on_time, strlen(led_on_time), HAL_MAX_DELAY);
+		break;
+	}
+	return 1;
+}
+
 /* USER CODE END 4 */
 
 /**

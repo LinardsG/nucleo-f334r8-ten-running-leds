@@ -55,7 +55,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 extern int led_counter;
-extern int increment;
+extern int position_increment;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
