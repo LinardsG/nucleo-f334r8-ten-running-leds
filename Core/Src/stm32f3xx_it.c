@@ -298,6 +298,7 @@ void TIM6_DAC1_IRQHandler(void)
     default:
       break;
   }
+  printf("Led No. %d is on.\n", led_counter);
   /* USER CODE END TIM6_DAC1_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_DAC1_IRQn 1 */
