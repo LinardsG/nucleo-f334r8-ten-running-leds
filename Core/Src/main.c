@@ -48,6 +48,7 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 int led_counter = 0;
 int increment = 1;
+uint8_t buffer[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -125,6 +126,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  //	  HAL_UART_Transmit(&huart2, buffer, 10, 100);
+	  	  HAL_UART_Transmit(&huart2, "TEST", 5, 100);
+	  	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
@@ -219,7 +223,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 38400;
+  huart2.Init.BaudRate = 11520;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
